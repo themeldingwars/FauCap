@@ -1,0 +1,3 @@
+[submodule "Arcporter/Lib/Pyre"]
+	path = Arcporter/Lib/Pyre
+	url = https://github.com/themeldingwars/Pyre.git
