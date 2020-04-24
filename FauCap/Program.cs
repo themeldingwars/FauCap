@@ -155,9 +155,10 @@ namespace FauCap
                             break;
                     }
                 }
-                else if(data != null && status == Status.Hugged && sessions.Last().SocketID == MemoryMarshal.Read<int>(data))
+                else if(data != null && status == Status.Hugged && sessions.Last().SocketID == MemoryMarshal.Read<uint>(data))
                 {
-                    sessions.Last().Packets.Add(new GameSession.Packet(time, ipPacket.DestinationAddress == sessions.Last().LocalIp, data));
+                    bool fromServer = ipPacket.DestinationAddress.Address == sessions.Last().LocalIp.Address;
+                    sessions.Last().Packets.Add(new GameSession.Packet(time, fromServer, data));
                 }
 
             }
