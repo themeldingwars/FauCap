@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FauCap
 {
-    internal static class PacketUtil
+    static class PacketUtil
     {
         public static bool IsControlPacket(Span<byte> data)
         {

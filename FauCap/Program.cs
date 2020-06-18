@@ -11,18 +11,12 @@ namespace FauCap
 {
     class Program
     {
-
-        static List<GameSession> sessions;
-        private static Status status;
-
         private static string usage = "";
 
         static void Main(string[] args)
         {
-
             string inFile = "";
             string outFile = "";
-
 
             if (args.Length > 0 )
             {
@@ -51,126 +45,8 @@ namespace FauCap
                 return;
             }
 
-            sessions = new List<GameSession>();
-            status = Status.Waiting;
-
-            CaptureFileReaderDevice device;
-            try
-            {
-                device = new CaptureFileReaderDevice(inFile);
-                device.Open();
-                Console.WriteLine($"Parsing pcap file {inFile}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Could not parse {inFile}, is it a valid pcap capture?");
-                return;
-            }
-
-            device.OnPacketArrival += new PacketArrivalEventHandler(OnPacketArrival);
-            device.Capture();
-            device.Close();
-
-            Console.WriteLine($"Done parsing {inFile}, " + (sessions.Count > 0 ? $"{sessions.Count} sessions was found, exporting faucap." : "but no game sessions was found."));
-
+            var sessions = new Converter().PcapFileToFaucap(inFile);
             GameSession.Write(outFile, sessions);
-
-        }
-
-        static void OnPacketArrival(object sender, CaptureEventArgs e)
-        {
-            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet)
-            {
-                var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
-
-                var udpPacket = (PacketDotNet.UdpPacket)packet.Extract<PacketDotNet.UdpPacket>();
-
-                var ipPacket = (PacketDotNet.IPv4Packet)packet.Extract<PacketDotNet.IPv4Packet>();
-
-                if (udpPacket == null) { return; }
-                byte[] data = udpPacket.PayloadData;
-
-                DateTime time = e.Packet.Timeval.Date;
-                
-                if(IsHandshakePacket(data))
-                {
-                    switch (Handshake.ReadName(data))
-                    {
-                        case "POKE":
-                            status = Status.Poked;
-                            GameSession session = new GameSession();
-                            session.Packets.Add(new GameSession.Packet(time, false, data));
-
-                            session.LocalIp = ipPacket.SourceAddress;
-                            session.RemoteIp = ipPacket.DestinationAddress;
-                            session.MatrixPort = udpPacket.DestinationPort;
-
-                            session.ProtocolVersion = Handshake.ReadProtocolVersion(data);
-
-                            sessions.Add(session);
-                            break;
-
-                        case "HEHE":
-                            if(status != Status.Poked)
-                            {
-                                status = Status.Waiting;
-                                break;
-                            }
-
-                            status = Status.Laughed;
-                            sessions.Last().SocketID = Handshake.ReadSocketId(data);
-                            sessions.Last().Packets.Add(new GameSession.Packet(time, true, data));
-                            break;
-
-                        case "KISS":
-                            if (status != Status.Laughed)
-                            {
-                                status = Status.Waiting;
-                                break;
-                            }
-
-                            status = Status.Kissed;
-                            sessions.Last().StreamingProtocol = Handshake.ReadStreamingProtocol(data);
-                            sessions.Last().Packets.Add(new GameSession.Packet(time, false, data));
-                            break;
-
-                        case "HUGG":
-                            if (status != Status.Kissed)
-                            {
-                                status = Status.Waiting;
-                                break;
-                            }
-
-                            status = Status.Hugged;
-                            sessions.Last().SequenceStart = Handshake.ReadSequenceStart(data);
-                            sessions.Last().GameServerPort = Handshake.ReadGameServerPort(data);
-                            sessions.Last().Packets.Add(new GameSession.Packet(time, true, data));
-                            break;
-
-                        case "ABRT":
-                            if (status != Status.Waiting && sessions.Last().LocalIp != null)
-                            {
-                                sessions.Last().Packets.Add(new GameSession.Packet(time, ipPacket.DestinationAddress == sessions.Last().LocalIp, data));
-                            }
-                            break;
-                    }
-                }
-                else if(data != null && status == Status.Hugged && sessions.Last().SocketID == MemoryMarshal.Read<uint>(data))
-                {
-                    bool fromServer = ipPacket.DestinationAddress.Address == sessions.Last().LocalIp.Address;
-                    sessions.Last().Packets.Add(new GameSession.Packet(time, fromServer, data));
-                }
-
-            }
-        }
-
-        public enum Status
-        {
-            Waiting,
-            Poked,
-            Laughed,
-            Kissed,
-            Hugged,
         }
     }
 }
