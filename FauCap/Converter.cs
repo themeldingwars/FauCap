@@ -28,6 +28,7 @@ namespace FauCap
             catch (Exception e)
             {
                 Console.WriteLine($"Could not parse {InFile}, is it a valid pcap capture?");
+                Console.WriteLine(e);
                 return null;
             }
 
