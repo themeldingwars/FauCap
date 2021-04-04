@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace FauCap
 {
@@ -56,7 +57,7 @@ namespace FauCap
             }
             public static ushort ReadSequenceStart(Span<byte> data)
             {
-                return MemoryMarshal.Read<ushort>(data.Slice(8, 2));
+                return ReadUInt16BigEndian(data.Slice(8, 2));
             }
             public static ushort ReadGameServerPort(Span<byte> data)
             {
