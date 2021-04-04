@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FauCap", "FauCap\FauCap.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FauCapParser", "FauCapParser\FauCapParser.csproj", "{DD75F93F-2056-4F60-AC47-9EB0C8A40489}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{A3571C97-1045-4185-BAB4-9BEFB2D9B3CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{DD75F93F-2056-4F60-AC47-9EB0C8A40489}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD75F93F-2056-4F60-AC47-9EB0C8A40489}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD75F93F-2056-4F60-AC47-9EB0C8A40489}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3571C97-1045-4185-BAB4-9BEFB2D9B3CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3571C97-1045-4185-BAB4-9BEFB2D9B3CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3571C97-1045-4185-BAB4-9BEFB2D9B3CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3571C97-1045-4185-BAB4-9BEFB2D9B3CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
