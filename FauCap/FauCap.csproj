@@ -10,6 +10,7 @@
     <Product>FauCap</Product>
     <Version>1.1.0</Version>
     <AssemblyVersion>1.11.0.0</AssemblyVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   

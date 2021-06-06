@@ -1,0 +1,39 @@
+name: Build and publish
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore -c Release
+
+      - name: Publish FauCap nuget
+        uses: rohith/publish-nuget@v2
+        if: github.event_name != 'pull_request'
+        with:
+          PROJECT_FILE_PATH: FauCap/FauCap.csproj
+          PACKAGE_NAME: FauCap
+          NUGET_KEY: ${{secrets.TMW_NUGET}}
+
+      - name: Publish FauCap Parser nuget
+        uses: rohith/publish-nuget@v2
+        if: github.event_name != 'pull_request'
+        with:
+          PROJECT_FILE_PATH: FauCapParser/FauCapParser.csproj
+          PACKAGE_NAME: FauCapParser
+          NUGET_KEY: ${{secrets.TMW_NUGET}}
