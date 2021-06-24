@@ -9,13 +9,18 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <Product>FauCap</Product>
     <Version>1.1.0</Version>
-    <AssemblyVersion>1.11.0.0</AssemblyVersion>
+    <AssemblyVersion>1.12.0.0</AssemblyVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   
   <ItemGroup>
     <PackageReference Include="SharpPcap" Version="5.4.0" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
+    <ProjectReference Include="..\FauCapParser\FauCapParser.csproj" />
   </ItemGroup>
 
 </Project>

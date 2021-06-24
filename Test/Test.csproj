@@ -7,6 +7,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\FauCapParser\FauCapParser.csproj" />
+      <ProjectReference Include="..\FauCap\FauCap.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SharpPcap" Version="5.4.0" />
     </ItemGroup>
 
 </Project>

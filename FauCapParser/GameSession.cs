@@ -114,7 +114,7 @@ namespace FauCap
             return (ushort)((ushort)((x & 0xff) << 8) | ((x >> 8) & 0xff));
         }
         
-        private void Reassemble(bool verboseLog)
+        public void Reassemble(bool verboseLog)
         {
             Packets = new List<Packet>();
             Messages = new List<Message>();

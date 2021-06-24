@@ -11,10 +11,12 @@ namespace FauCap
     public class Converter
     {
         List<GameSession> Sessions = new List<GameSession>();
-        private Status CurrentStatus;
+        private Status    CurrentStatus;
+        private int       Idx = 0;
 
         public List<GameSession> PcapFileToFaucap(string InFile)
         {
+            Idx           = 0;
             Sessions      = new List<GameSession>();
             CurrentStatus = Status.Waiting;
 
@@ -37,6 +39,10 @@ namespace FauCap
             device.Close();
 
             Console.WriteLine($"Done parsing {InFile}, " + (Sessions.Count > 0 ? $"{Sessions.Count} sessions was found, exporting faucap." : "but no game sessions was found."));
+
+            foreach (var session in Sessions) {
+                session.Reassemble(false);
+            }
 
             return Sessions;
         }
@@ -63,7 +69,7 @@ namespace FauCap
                         case "POKE":
                             CurrentStatus = Status.Poked;
                             GameSession session = new GameSession();
-                            session.Packets.Add(new GameSession.Packet(time, false, data));
+                            session.Datagrams.Add(new Datagram(Idx++, time, false, data));
 
                             session.LocalIp = ipPacket.SourceAddress;
                             session.RemoteIp = ipPacket.DestinationAddress;
@@ -83,7 +89,7 @@ namespace FauCap
 
                             CurrentStatus = Status.Laughed;
                             Sessions.Last().SocketID = Handshake.ReadSocketId(data);
-                            Sessions.Last().Packets.Add(new GameSession.Packet(time, true, data));
+                            Sessions.Last().Datagrams.Add(new Datagram(Idx++, time, true, data));
                             break;
 
                         case "KISS":
@@ -95,7 +101,7 @@ namespace FauCap
 
                             CurrentStatus = Status.Kissed;
                             Sessions.Last().StreamingProtocol = Handshake.ReadStreamingProtocol(data);
-                            Sessions.Last().Packets.Add(new GameSession.Packet(time, false, data));
+                            Sessions.Last().Datagrams.Add(new Datagram(Idx++, time, false, data));
                             break;
 
                         case "HUGG":
@@ -108,13 +114,13 @@ namespace FauCap
                             CurrentStatus = Status.Hugged;
                             Sessions.Last().SequenceStart = Handshake.ReadSequenceStart(data);
                             Sessions.Last().GameServerPort = Handshake.ReadGameServerPort(data);
-                            Sessions.Last().Packets.Add(new GameSession.Packet(time, true, data));
+                            Sessions.Last().Datagrams.Add(new Datagram(Idx++, time, true, data));
                             break;
 
                         case "ABRT":
                             if (CurrentStatus != Status.Waiting && Sessions.Last().LocalIp != null)
                             {
-                                Sessions.Last().Packets.Add(new GameSession.Packet(time, ipPacket.DestinationAddress == Sessions.Last().LocalIp, data));
+                                Sessions.Last().Datagrams.Add(new Datagram(Idx++, time, ipPacket.DestinationAddress  == Sessions.Last().LocalIp, data));
                             }
                             break;
                     }
@@ -122,7 +128,7 @@ namespace FauCap
                 else if (data != null && CurrentStatus == Status.Hugged && Sessions.Last().SocketID == MemoryMarshal.Read<uint>(data))
                 {
                     bool fromServer = ipPacket.DestinationAddress.Address == Sessions.Last().LocalIp.Address;
-                    Sessions.Last().Packets.Add(new GameSession.Packet(time, fromServer, data));
+                    Sessions.Last().Datagrams.Add(new Datagram(Idx++, time, fromServer, data));
                 }
 
             }
