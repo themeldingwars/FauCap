@@ -62,6 +62,14 @@ namespace FauCap
                 
             }
         }
+
+        public GamePacket() : base(0, new Datagram(0, DateTime.MinValue, true, null))
+        {
+            Channel     = Channel.UnreliableGss;
+            IsSplit     = false;
+            IsSequenced = false;
+            IsReliable  = false;
+        }
             
         public override Span<byte> Raw => Datagram.Data.Slice(Offset, Length);
         public override Span<byte> Data => Datagram.Data.Slice(Offset + HeaderLength, Length - HeaderLength);
