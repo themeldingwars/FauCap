@@ -127,7 +127,8 @@ namespace FauCap
                 }
                 else if (data != null && CurrentStatus == Status.Hugged && Sessions.Last().SocketID == MemoryMarshal.Read<uint>(data))
                 {
-                    bool fromServer = ipPacket.DestinationAddress.Address == Sessions.Last().LocalIp.Address;
+                    
+                    bool fromServer = udpPacket.SourcePort == Sessions.Last().GameServerPort;
                     Sessions.Last().Datagrams.Add(new Datagram(Idx++, time, fromServer, data));
                 }
 
