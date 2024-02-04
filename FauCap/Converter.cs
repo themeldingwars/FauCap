@@ -49,8 +49,9 @@ namespace FauCap
 
         void OnPacketArrival(object sender, CaptureEventArgs e)
         {
-            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet)
+            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet || e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Null)
             {
+                
                 var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
 
                 var udpPacket = (PacketDotNet.UdpPacket)packet.Extract<PacketDotNet.UdpPacket>();
@@ -61,7 +62,6 @@ namespace FauCap
                 byte[] data = udpPacket.PayloadData;
 
                 DateTime time = e.Packet.Timeval.Date;
-
                 if (IsHandshakePacket(data))
                 {
                     switch (Handshake.ReadName(data))
