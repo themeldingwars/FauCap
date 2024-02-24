@@ -61,7 +61,7 @@ namespace FauCap
             }
             public static ushort ReadGameServerPort(Span<byte> data)
             {
-                return MemoryMarshal.Read<ushort>(data.Slice(10, 2));
+                return ReadUInt16BigEndian(data.Slice(10, 2));
             }
         }
     }

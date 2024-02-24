@@ -49,8 +49,9 @@ namespace FauCap
 
         void OnPacketArrival(object sender, CaptureEventArgs e)
         {
-            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet)
+            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet || e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Null)
             {
+                
                 var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
 
                 var udpPacket = (PacketDotNet.UdpPacket)packet.Extract<PacketDotNet.UdpPacket>();
@@ -61,7 +62,6 @@ namespace FauCap
                 byte[] data = udpPacket.PayloadData;
 
                 DateTime time = e.Packet.Timeval.Date;
-
                 if (IsHandshakePacket(data))
                 {
                     switch (Handshake.ReadName(data))
@@ -127,7 +127,8 @@ namespace FauCap
                 }
                 else if (data != null && CurrentStatus == Status.Hugged && Sessions.Last().SocketID == MemoryMarshal.Read<uint>(data))
                 {
-                    bool fromServer = ipPacket.DestinationAddress.Address == Sessions.Last().LocalIp.Address;
+                    
+                    bool fromServer = udpPacket.SourcePort == Sessions.Last().GameServerPort;
                     Sessions.Last().Datagrams.Add(new Datagram(Idx++, time, fromServer, data));
                 }
 
