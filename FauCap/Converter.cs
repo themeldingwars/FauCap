@@ -47,12 +47,13 @@ namespace FauCap
             return Sessions;
         }
 
-        void OnPacketArrival(object sender, CaptureEventArgs e)
+        void OnPacketArrival(object sender, PacketCapture e)
         {
-            if (e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Ethernet || e.Packet.LinkLayerType == PacketDotNet.LinkLayers.Null)
+            var linkLayerType = ((ICaptureDevice)sender).LinkType;
+            if (linkLayerType == PacketDotNet.LinkLayers.Ethernet || linkLayerType == PacketDotNet.LinkLayers.Null)
             {
                 
-                var packet = PacketDotNet.Packet.ParsePacket(e.Packet.LinkLayerType, e.Packet.Data);
+                var packet = PacketDotNet.Packet.ParsePacket(linkLayerType, e.Data.ToArray());
 
                 var udpPacket = (PacketDotNet.UdpPacket)packet.Extract<PacketDotNet.UdpPacket>();
 
@@ -61,7 +62,7 @@ namespace FauCap
                 if (udpPacket == null) { return; }
                 byte[] data = udpPacket.PayloadData;
 
-                DateTime time = e.Packet.Timeval.Date;
+                DateTime time = e.Header.Timeval.Date;
                 if (IsHandshakePacket(data))
                 {
                     switch (Handshake.ReadName(data))

@@ -8,7 +8,7 @@ namespace FauCap
 {
     static class PacketUtil
     {
-        public static bool IsControlPacket(Span<byte> data)
+        public static bool IsControlPacket(ReadOnlySpan<byte> data)
         {
             if (data.Length >= 4)
             {
@@ -17,7 +17,7 @@ namespace FauCap
             return false;
         }
 
-        public static bool IsHandshakePacket(Span<byte> data)
+        public static bool IsHandshakePacket(ReadOnlySpan<byte> data)
         {
             if (data.Length > 8)
             {
@@ -39,27 +39,27 @@ namespace FauCap
 
         public static class Handshake
         {
-            public static string ReadName(Span<byte> data)
+            public static string ReadName(ReadOnlySpan<byte> data)
             {
                 return Encoding.ASCII.GetString(data.Slice(4, 4));
             }
-            public static uint ReadProtocolVersion(Span<byte> data)
+            public static uint ReadProtocolVersion(ReadOnlySpan<byte> data)
             {
                 return MemoryMarshal.Read<uint>(data.Slice(8, 4));
             }
-            public static uint ReadSocketId(Span<byte> data)
+            public static uint ReadSocketId(ReadOnlySpan<byte> data)
             {
                 return MemoryMarshal.Read<uint>(data.Slice(8, 4));
             }
-            public static ushort ReadStreamingProtocol(Span<byte> data)
+            public static ushort ReadStreamingProtocol(ReadOnlySpan<byte> data)
             {
                 return MemoryMarshal.Read<ushort>(data.Slice(12, 2));
             }
-            public static ushort ReadSequenceStart(Span<byte> data)
+            public static ushort ReadSequenceStart(ReadOnlySpan<byte> data)
             {
                 return ReadUInt16BigEndian(data.Slice(8, 2));
             }
-            public static ushort ReadGameServerPort(Span<byte> data)
+            public static ushort ReadGameServerPort(ReadOnlySpan<byte> data)
             {
                 return ReadUInt16BigEndian(data.Slice(10, 2));
             }
