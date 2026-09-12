@@ -2,38 +2,75 @@ name: Build and publish
 
 on:
   push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_DIRECTORY: ${{ github.workspace }}/nuget
 
 jobs:
   build:
+    name: ${{ matrix.platform.name }} ${{ matrix.dotnet.name }}
+    runs-on: ${{ matrix.platform.os }}
 
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+        - { name: Linux, os: ubuntu-24.04 }
+        - { name: Windows, os: windows-2025-vs2026 }
+        dotnet:
+        - { name: .NET 8, version: '8.0.x' }
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+      - name: Checkout
+        uses: actions/checkout@v7
         with:
-          dotnet-version: 8.0.x
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup ${{ matrix.dotnet.name }} SDK
+        id: setup-dotnet
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ matrix.dotnet.version }}
+      - name: Enforce SDK Version
+        env:
+          DOTNET_VERSION: ${{ steps.setup-dotnet.outputs.dotnet-version }}
+        run: dotnet new globaljson --sdk-version "$DOTNET_VERSION" --force
+      - name: Verify SDK Installation
+        run: dotnet --info
+
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore -c Release
 
-      - name: Publish FauCap nuget
-        uses: rohith/publish-nuget@v2
-        if: github.event_name != 'pull_request'
-        with:
-          PROJECT_FILE_PATH: FauCap/FauCap.csproj
-          PACKAGE_NAME: FauCap
-          NUGET_KEY: ${{secrets.TMW_NUGET}}
+      - name: Pack FauCap
+        run: dotnet pack --no-build -c Release FauCap/FauCap.csproj --output "$NUGET_DIRECTORY"
+      - name: Pack FauCapParser
+        run: dotnet pack --no-build -c Release FauCapParser/FauCapParser.csproj --output "$NUGET_DIRECTORY"
 
-      - name: Publish FauCap Parser nuget
-        uses: rohith/publish-nuget@v2
-        if: github.event_name != 'pull_request'
+      - name: NuGet Login
+        if: matrix.platform.name == 'Linux' && startsWith(github.ref, 'refs/tags/v')
+        uses: NuGet/login@v1
+        id: login
         with:
-          PROJECT_FILE_PATH: FauCapParser/FauCapParser.csproj
-          PACKAGE_NAME: FauCapParser
-          NUGET_KEY: ${{secrets.TMW_NUGET}}
+          user: TMW
+      - name: Publish NuGet packages
+        if: matrix.platform.name == 'Linux' && startsWith(github.ref, 'refs/tags/v')
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "$NUGET_DIRECTORY"/*.nupkg --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
