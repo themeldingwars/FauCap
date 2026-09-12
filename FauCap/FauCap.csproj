@@ -4,12 +4,22 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Authors>freakbyte</Authors>
-    <Company>TheMeldingWars</Company>
     <RepositoryUrl>https://github.com/themeldingwars/FauCap</RepositoryUrl>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <Product>FauCap</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Parses Firefall network packet captures (.pcap) into structured Matrix protocol data.</Description>
+    <PackageTags>firefall;pcap;packet-capture;matrix;networking</PackageTags>
+    <PackageProjectUrl>https://github.com/themeldingwars/FauCap</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 
   <ItemGroup>

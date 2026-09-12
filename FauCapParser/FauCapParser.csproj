@@ -5,8 +5,20 @@
     <LangVersion>9</LangVersion>
     <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Company>TheMeldingWars</Company>
+    <Authors>The Melding Wars</Authors>
+    <Description>Core parsing library behind FauCap for reading Firefall Matrix protocol packet captures.</Description>
+    <PackageTags>firefall;pcap;matrix;parser</PackageTags>
+    <PackageProjectUrl>https://github.com/themeldingwars/FauCap</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.10.94">
