@@ -5,8 +5,8 @@ namespace FauCap
 {
     public class GamePacket : Packet
     {
-        private static readonly byte[] xorByte = new byte[] { 0x00, 0xFF, 0xCC, 0xAA };
-        private static readonly ulong[] xorULong = new ulong [] { 0x00, 0xFFFFFFFFFFFFFFFF, 0xCCCCCCCCCCCCCCCC, 0xAAAAAAAAAAAAAAAA };
+        private static readonly byte[] xorByte = new byte[] { 0x00, 0xFF, 0xAA, 0xCC };
+        private static readonly ulong[] xorULong = new ulong [] { 0x00, 0xFFFFFFFFFFFFFFFF, 0xAAAAAAAAAAAAAAAA, 0xCCCCCCCCCCCCCCCC };
         
         public readonly int Offset;
         public readonly Channel Channel;
